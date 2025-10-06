@@ -4,20 +4,8 @@
 [![license](https://img.shields.io/github/license/itpey/shinyid)](https://github.com/itpey/shinyid/blob/main/LICENSE)
 
 ## About
-ShinyID is a high-performance Go package inspired by the Instagram shortcode system. It allows you to encode and decode unique identifiers (IDs) into a human-readable and URL-safe string format called 'shiny'. This package is designed for scenarios where speed and efficiency are crucial, making it ideal for applications that need to handle large volumes of encoded IDs.
 
-## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Encoding (ID to Shiny)](#encoding-id-to-shiny)
-  - [Decoding (Shiny to ID)](#decoding-shiny-to-id)
-- [Example](#example) 
-- [Benchmark Results](#benchmark-results)
-- [Running Tests](#running-tests)
-- [Running Benchmarks](#running-benchmarks)
-- [License](#license)
-- [Author](#author)
+ShinyID is a high-performance Go package inspired by the Instagram shortcode system. It allows you to encode and decode unique identifiers (IDs) into a human-readable and URL-safe string format called 'shiny'. This package is designed for scenarios where speed and efficiency are crucial, making it ideal for applications that need to handle large volumes of encoded IDs.
 
 ## Features
 
@@ -27,34 +15,15 @@ ShinyID is a high-performance Go package inspired by the Instagram shortcode sys
 - **Inspired by Instagram :** The package draws inspiration from Instagram's shortcode system, ensuring a familiar and intuitive approach to representing IDs.
 
 ## Installation
+
 To integrate ShinyID into your Go project, you can easily install it using `go get`:
 
 ```bash
-go get github.com/itpey/shinyid
-```
-
-## Usage
-
-### Encoding (ID to Shiny)
-
-You can quickly convert a numeric ID to its shiny representation using the ToShiny function:
-
-```go
-shiny := shinyid.ToShiny(9375)
-```
-
-### Decoding (Shiny to ID)
-
-To decode a shiny string back into its original numeric ID, use the ToId function:
-
-```go
-id, err := shinyid.ToId("CSf")
-if err != nil {
-    // Handle error
-}
+go get -u github.com/itpey/shinyid
 ```
 
 ## Example
+
 Here's a simple example showcasing the use of ShinyID:
 
 ```go
@@ -84,10 +53,12 @@ func main() {
 
 ### Benchmark results on an Intel Core i7-6700HQ CPU @ 2.60GHz:
 
-- **BenchmarkShinyIDEncoding :** ShinyID encoding took approximately **15.96** nanoseconds per operation.
-- **BenchmarkShinyIDDecoding :** ShinyID decoding took approximately **28.04** nanoseconds per operation.
-- **BenchmarkBase64Encoding :** base64 encoding took approximately **105.2** nanoseconds per operation.
-- **BenchmarkBase64Decoding :** base64 decoding took approximately **84.01** nanoseconds per operation.
+|                  Benchmark |  Iterations | ns/op | B/op | allocs/op |
+| -------------------------: | ----------: | ----: | ---: | --------: |
+| BenchmarkShinyIDEncoding-8 |  44,686,579 | 26.32 |    0 |         0 |
+| BenchmarkShinyIDDecoding-8 | 100,000,000 | 11.65 |    0 |         0 |
+|  BenchmarkBase64Encoding-8 |  12,006,302 | 94.64 |   32 |         1 |
+|  BenchmarkBase64Decoding-8 |  10,615,081 | 111.0 |   24 |         1 |
 
 Based on these benchmark results, ShinyID significantly outperforms base64 encoding and decoding, especially in encoding operations. This performance advantage makes ShinyID an excellent choice for applications that require fast encoding and decoding of unique identifiers.
 
@@ -98,6 +69,7 @@ To run tests for ShinyID, use the following command:
 ```bash
 go test github.com/itpey/shinyid
 ```
+
 ## Running Benchmarks
 
 To run benchmarks for ShinyID, use the following command:
@@ -105,10 +77,21 @@ To run benchmarks for ShinyID, use the following command:
 ```bash
 go test -bench=. github.com/itpey/shinyid
 ```
+
+## Feedback and Contributions
+
+If you encounter any issues or have suggestions for improvement, please [open an issue](https://github.com/itpey/shinyid/issues) on GitHub.
+
+We welcome contributions! Fork the repository, make your changes, and submit a pull request.
+
+## Support
+
+If you enjoy using ShinyID, please consider giving it a star! Your support helps others discover the project and encourages further development.
+
 ## License
-This package is distributed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/itpey/shinyid/blob/main/LICENSE) file for more details.
+
+ShinyID is distributed under the Apache License, Version 2.0. See the [LICENSE](https://github.com/itpey/shinyid/blob/main/LICENSE) file for more details.
 
 ## Author
+
 ShinyID was created by [itpey](https://github.com/itpey).
-\
-Experience the power and speed of ShinyID for your Go applications!
