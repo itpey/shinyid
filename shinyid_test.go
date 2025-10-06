@@ -1,4 +1,4 @@
-// Copyright 2023 itpey
+// Copyright 2025 itpey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,10 @@ func TestToShiny(t *testing.T) {
 		{1, "B"},
 		{500, "H0"},
 		{9375, "CSf"},
+		{3725911558863297658, "DO1GNJykZx6"},
+		{18446744073709551614, "P_________-"},
 		{18446744073709551615, "P__________"},
 	}
-
 	for _, test := range tests {
 		result := ToShiny(test.id)
 		if result != test.expectedCode {
@@ -53,11 +54,12 @@ func TestToID(t *testing.T) {
 		{"B", 1, false},
 		{"H0", 500, false},
 		{"CSf", 9375, false},
+		{"DO1GNJykZx6", 3725911558863297658, false},
+		{"P_________-", 18446744073709551614, false},
 		{"P__________", 18446744073709551615, false},
 		{"#", 100, true},
 		{"1_$_", 200, true},
 	}
-
 	for _, test := range tests {
 		result, err := ToId(test.code)
 		if err != nil {
@@ -66,61 +68,14 @@ func TestToID(t *testing.T) {
 			}
 			continue
 		}
-
 		if result != test.expectedId {
 			t.Errorf("ToId(%s) = %d, expected %d", test.code, result, test.expectedId)
 		}
 	}
 }
 
-func TestIsValidShiny(t *testing.T) {
-	tests := []struct {
-		code         string
-		expectedBool bool
-	}{
-		{"A", true},
-		{"b", true},
-		{"_", true},
-		{"-", true},
-		{"F_0", true},
-		{"fPg97-", true},
-		{"!@#$%", false},
-		{"1_1-Q_@-", false},
-	}
-
-	for _, test := range tests {
-		result := isValidShiny(test.code)
-		if result != test.expectedBool {
-			t.Errorf("isValidShiny(%s) = %v, expected %v", test.code, result, test.expectedBool)
-		}
-	}
-}
-
-func TestIsAlphaNumeric(t *testing.T) {
-	tests := []struct {
-		char         rune
-		expectedBool bool
-	}{
-		{'A', true},
-		{'a', true},
-		{'Z', true},
-		{'z', true},
-		{'0', true},
-		{'9', true},
-		{'#', false},
-		{'@', false},
-		{'$', false},
-	}
-
-	for _, test := range tests {
-		result := isAlphaNumeric(test.char)
-		if result != test.expectedBool {
-			t.Errorf("isAlphaNumeric(%c) = %v, expected %v", test.char, result, test.expectedBool)
-		}
-	}
-}
-
 func BenchmarkShinyIDEncoding(b *testing.B) {
+	b.ReportAllocs()
 	id := uint64(18446744073709551615)
 	for i := 0; i < b.N; i++ {
 		ToShiny(id)
@@ -128,6 +83,7 @@ func BenchmarkShinyIDEncoding(b *testing.B) {
 }
 
 func BenchmarkShinyIDDecoding(b *testing.B) {
+	b.ReportAllocs()
 	shiny := "P__________"
 	for i := 0; i < b.N; i++ {
 		ToId(shiny)
@@ -135,6 +91,7 @@ func BenchmarkShinyIDDecoding(b *testing.B) {
 }
 
 func BenchmarkBase64Encoding(b *testing.B) {
+	b.ReportAllocs()
 	data := []byte("18446744073709551615")
 	for i := 0; i < b.N; i++ {
 		base64.StdEncoding.EncodeToString(data)
@@ -142,8 +99,9 @@ func BenchmarkBase64Encoding(b *testing.B) {
 }
 
 func BenchmarkBase64Decoding(b *testing.B) {
+	b.ReportAllocs()
 	data := "MTg0NDY3NDQwNzM3MDk1NTE2MTU="
 	for i := 0; i < b.N; i++ {
-		_, _ = base64.StdEncoding.DecodeString(data)
+		base64.StdEncoding.DecodeString(data)
 	}
 }
