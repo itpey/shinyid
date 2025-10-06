@@ -1,4 +1,4 @@
-// Copyright 2023 itpey
+// Copyright 2025 itpey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,79 +14,52 @@
 
 package shinyid
 
-import (
-	"errors"
-)
+import "errors"
 
-const (
-	base64URLCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-)
+const base64URLCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
 var (
-	base64URLCharsetIndex [256]byte               // Lookup table for character indices
-	base64URLCharsetLen   = len(base64URLCharset) // Length of the character set
+	decodeIdx [256]byte
 )
 
 func init() {
-	for i := 0; i < base64URLCharsetLen; i++ {
-		base64URLCharsetIndex[base64URLCharset[i]] = byte(i)
+	// initialize all to 0xFF (invalid)
+	for i := range decodeIdx {
+		decodeIdx[i] = 0xFF
+	}
+	for i := 0; i < len(base64URLCharset); i++ {
+		decodeIdx[base64URLCharset[i]] = byte(i)
 	}
 }
 
 // ToShiny converts an id to a shiny.
 func ToShiny(id uint64) string {
-
-	if id == 0 {
-		return "A"
+	// Max length: ceil(64/6)=11
+	var b [11]byte
+	i := len(b) - 1
+	for {
+		b[i] = base64URLCharset[id&0x3F]
+		id >>= 6
+		if id == 0 {
+			return string(b[i:])
+		}
+		i--
 	}
-
-	var shiny [11]byte // Fixed-length array to store the shiny
-	i := 10            // Index for storing characters in the shiny array
-
-	for id > 0 {
-		shiny[i] = base64URLCharset[id&0x3F] // Extract the character from the character set
-		id >>= 6                             // Shift the id by 6 bits to the right
-		i--                                  // Decrement the index
-	}
-
-	return string(shiny[i+1:]) // Convert the shiny array to a string
 }
 
 // ToId converts a shiny to its corresponding id.
 func ToId(shiny string) (uint64, error) {
-
-	if shiny == "A" {
-		return 0, nil
+	if len(shiny) == 0 || len(shiny) > 11 {
+		return 0, errors.New("invalid shiny")
 	}
-
-	// Check if the shiny is a valid shiny
-	if !isValidShiny(shiny) {
-		return 0, errors.New("input must be a valid shiny")
-	}
-
-	// Convert the shiny to base10 id
-	base10 := uint64(0)
+	var v uint64
 	for i := 0; i < len(shiny); i++ {
-		base64 := shiny[i]
-		base64Value := base64URLCharsetIndex[base64]
-		base10 = (base10 << 6) | uint64(base64Value)
-	}
-
-	return base10, nil
-}
-
-// isValidShiny checks if a given shiny is a valid shiny.
-func isValidShiny(shiny string) bool {
-
-	for _, char := range shiny {
-		if !isAlphaNumeric(char) && char != '-' && char != '_' {
-			return false
+		c := shiny[i]
+		idx := decodeIdx[c]
+		if idx == 0xFF {
+			return 0, errors.New("invalid shiny")
 		}
+		v = (v << 6) | uint64(idx)
 	}
-	return true
-}
-
-// isAlphaNumeric checks if a character is an alphanumeric character.
-func isAlphaNumeric(char rune) bool {
-	return ('A' <= char && char <= 'Z') || ('a' <= char && char <= 'z') || ('0' <= char && char <= '9')
+	return v, nil
 }
